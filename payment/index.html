@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment - MuseoBot</title>
+    <style>
+        body {
+            font-family: 'Helvetica', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: url('/static/images/Indian-Music-Museum-9.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            padding: 20px;
+        }
+
+        .payment-wrapper {
+            width: 90%;
+            max-width: 1000px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            display: flex;
+            flex-direction: row;
+        }
+
+        .payment-header {
+            background-color: #e63946;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            background-color: white;
+            padding: 5px;
+        }
+
+        .payment-options {
+            width: 30%;
+            background-color: #2c3e50;
+            padding: 20px;
+            color: white;
+        }
+
+        .payment-method {
+            padding: 15px;
+            cursor: pointer;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            background-color: #e63946;
+            transition: all 0.3s;
+        }
+
+        .payment-method:hover {
+            background-color: #e76f51;
+            transform: translateY(-2px);
+        }
+
+        .payment-form {
+            width: 40%;
+            padding: 20px;
+        }
+
+        .payment-form-content {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        input, .form-select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 2px solid #f4a261;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        button, .form-button {
+            width: 100%;
+            padding: 15px;
+            background-color: #f4a261;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 16px;
+        }
+
+        button:hover, .form-button:hover {
+            background-color: #e76f51;
+            transform: translateY(-2px);
+        }
+
+        .payment-summary {
+            width: 30%;
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+
+        .payment-summary h3 {
+            color: #e63946;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .payment-wrapper {
+                flex-direction: column;
+            }
+            .payment-options, .payment-form, .payment-summary {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="payment-wrapper">
+        <div class="payment-options">
+            <div class="payment-header">
+                <h2>Payment Options</h2>
+            </div>
+            <div class="payment-method" onclick="showSection('card')">Credit/Debit Card</div>
+            <div class="payment-method" onclick="showSection('banking')">Net Banking</div>
+            <div class="payment-method" onclick="showSection('upi')">UPI</div>
+            <div class="payment-method" onclick="showSection('googlepay')">Google Pay</div>
+        </div>
+
+        <div class="payment-form">
+            <div class="payment-form-content">
+                <form id="payment-form">
+                    <!-- Hidden fields for booking data -->
+                    <input type="hidden" id="museum" name="museum" value="">
+                    <input type="hidden" id="tickets" name="tickets" value="">
+                    <input type="hidden" id="date" name="date" value="">
+                    <input type="hidden" id="time" name="time" value="">
+                    <input type="hidden" id="price" name="price" value="">
+                    <input type="hidden" id="nationality" name="nationality" value="">
+                    <input type="hidden" id="payment_method" name="payment_method" value="card">
+
+                    <div id="card-section" class="payment-section active">
+                        <h3>Card Payment</h3>
+                        <input type="text" id="card-number" name="card_number" placeholder="Card Number" required>
+                        <div class="form-row">
+                            <input type="text" id="card-expiry" name="card_expiry" placeholder="MM/YY" required>
+                            <input type="text" id="card-cvv" name="card_cvv" placeholder="CVV" required>
+                        </div>
+                        <input type="text" id="card-name" name="card_name" placeholder="Card Holder Name" required>
+                        <button type="submit" id="submit-payment">Pay Now</button>
+                    </div>
+                </form>
+                <!-- UPI Payment Section -->
+                <div id="upi-section" class="payment-section">
+                    <h3>UPI Payment</h3>
+                    <p style="text-align: center; margin-bottom: 20px;">Enter UPI ID to pay</p>
+                    <input type="text" placeholder="Enter UPI ID (e.g., name@upi)">
+                    <button onclick="verifyUPI()">Verify & Pay</button>
+                </div>
+                
+                <!-- Add success message div -->
+                <div id="payment-success" style="display: none; text-align: center; color: #4CAF50;">
+                    <h3>Payment Successful!</h3>
+                    <p>Your ticket has been booked.</p>
+                    <button onclick="window.location.href='/'" style="margin-top: 20px;">Return to Home</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="payment-summary">
+            <h3>Order Summary</h3>
+            <p>Number of Tickets: {{ number_of_people }}</p>
+            <p>Nationality: {{ nationality }}</p>
+            <hr>
+            <h3>Total Amount: ₹{{ total_price }}</h3>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('payment-form');
+            const submitButton = document.getElementById('submit-payment');
+
+            // Initialize form with URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            // Update hidden form fields
+            document.getElementById('museum').value = urlParams.get('museum_name') || '';
+            document.getElementById('tickets').value = urlParams.get('number_of_people') || '';
+            document.getElementById('date').value = urlParams.get('date') || '';
+            document.getElementById('time').value = urlParams.get('time') || '';
+            document.getElementById('price').value = urlParams.get('price') || '';
+            document.getElementById('nationality').value = urlParams.get('nationality') || '';
+
+            // Log the values for debugging
+            console.log('Form initialized with:', {
+                museum: document.getElementById('museum').value,
+                tickets: document.getElementById('tickets').value,
+                date: document.getElementById('date').value,
+                time: document.getElementById('time').value,
+                price: document.getElementById('price').value,
+                nationality: document.getElementById('nationality').value
+            });
+
+            // Handle form submission
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                // Disable submit button
+                submitButton.disabled = true;
+                
+                try {
+                    const formData = new FormData(form);
+                    
+                    // Log the form data
+                    console.log('Submitting form data:', Object.fromEntries(formData));
+
+                    const response = await fetch('/process_payment', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const data = await response.json();
+                    console.log('Server response:', data);
+
+                    if (data.success) {
+                        window.location.href = `/payment/success?booking_id=${data.booking_id}`;
+                    } else {
+                        alert('Payment failed: ' + data.message);
+                        submitButton.disabled = false;
+                    }
+                } catch (error) {
+                    console.error('Payment error:', error);
+                    alert('Payment failed. Please try again.');
+                    submitButton.disabled = false;
+                }
+            });
+        });
+
+        function showSection(sectionId) {
+            // Update payment method
+            document.getElementById('payment_method').value = sectionId;
+            
+            // Show correct section
+            document.querySelectorAll('.payment-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            document.getElementById(`${sectionId}-section`).style.display = 'block';
+            
+            console.log('Selected payment method:', sectionId);
+        }
+
+        function verifyUPI() {
+            const upiId = document.querySelector('#upi-section input').value;
+            if (upiId.includes('@')) {
+                // Simulate payment processing
+                const paymentForm = document.querySelector('.payment-form-content');
+                paymentForm.innerHTML = `
+                    <div style="text-align: center;">
+                        <div class="loading" style="margin: 20px auto;">Processing Payment...</div>
+                    </div>
+                `;
+                
+                // Simulate payment success after 2 seconds
+                setTimeout(async () => {
+                    try {
+                        const response = await fetch('/process_payment', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: new URLSearchParams({
+                                'museum': document.getElementById('museum').value,
+                                'tickets': document.getElementById('tickets').value,
+                                'date': document.getElementById('date').value,
+                                'time': document.getElementById('time').value,
+                                'price': document.getElementById('price').value,
+                                'nationality': document.getElementById('nationality').value,
+                                'payment_method': 'upi'
+                            })
+                        });
+                        
+                        const data = await response.json();
+                        if (data.success) {
+                            window.location.href = `/payment/success?booking_id=${data.booking_id}`;
+                        } else {
+                            alert('Payment failed: ' + data.message);
+                        }
+                    } catch (error) {
+                        alert('Payment failed. Please try again.');
+                        console.error('Payment error:', error);
+                    }
+                }, 2000);
+            } else {
+                alert('Please enter a valid UPI ID');
+            }
+        }
+
+        function processCardPayment() {
+            const cardNumber = document.getElementById('card-number').value;
+            const cardExpiry = document.getElementById('card-expiry').value;
+            const cardCvv = document.getElementById('card-cvv').value;
+            const cardName = document.getElementById('card-name').value;
+
+            if (!cardNumber || !cardExpiry || !cardCvv || !cardName) {
+                alert('Please fill in all card details');
+                return;
+            }
+
+            // Show loading state
+            const paymentForm = document.querySelector('.payment-form-content');
+            paymentForm.innerHTML = `
+                <div style="text-align: center;">
+                    <div class="loading" style="margin: 20px auto;">Processing Payment...</div>
+                </div>
+            `;
+
+            // Get values from hidden fields
+            const formData = {
+                museum: document.getElementById('museum').value,
+                tickets: document.getElementById('tickets').value,
+                date: document.getElementById('date').value,
+                time: document.getElementById('time').value,
+                price: document.getElementById('price').value,
+                nationality: document.getElementById('nationality').value,
+                payment_method: 'card'
+            };
+
+            console.log('Sending payment data:', formData); // Debug log
+
+            // Process payment
+            fetch('/process_payment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Payment response:', data); // Debug log
+                if (data.success) {
+                    window.location.href = `/payment/success?booking_id=${data.booking_id}`;
+                } else {
+                    alert('Payment failed: ' + data.message);
+                    location.reload(); // Reload page on failure
+                }
+            })
+            .catch(error => {
+                console.error('Payment error:', error);
+                alert('Payment failed. Please try again.');
+                location.reload();
+            });
+        }
+
+        // Add loading animation style
+        const style = document.createElement('style');
+        style.textContent = `
+            .loading {
+                display: inline-block;
+                position: relative;
+                width: 80px;
+                height: 80px;
+            }
+            .loading:after {
+                content: " ";
+                display: block;
+                border-radius: 50%;
+                width: 0;
+                height: 0;
+                margin: 8px;
+                box-sizing: border-box;
+                border: 32px solid #e63946;
+                border-color: #e63946 transparent #e63946 transparent;
+                animation: loading 1.2s infinite;
+            }
+            @keyframes loading {
+                0% { transform: rotate(0); }
+                100% { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

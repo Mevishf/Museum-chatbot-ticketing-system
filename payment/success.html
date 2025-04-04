@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Confirmed - MuseoBot</title>
+    <style>
+        body {
+            font-family: 'Helvetica', sans-serif;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: url('/static/images/Indian-Music-Museum-9.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .success-wrapper {
+            width: 90%;
+            max-width: 600px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            text-align: center;
+        }
+
+        .success-icon {
+            font-size: 64px;
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+
+        .booking-details {
+            text-align: left;
+            margin: 30px 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .qr-code {
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+        }
+
+        .qr-code img {
+            width: 200px;
+            height: 200px;
+            margin-bottom: 10px;
+        }
+
+        .buttons {
+            margin-top: 30px;
+        }
+
+        .button {
+            background-color: #e63946;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 0 10px;
+            transition: all 0.3s;
+        }
+
+        .button:hover {
+            background-color: #dc2f3c;
+            transform: translateY(-2px);
+        }
+
+        @media print {
+            .no-print {
+                display: none;
+            }
+            body {
+                background: none;
+            }
+            .success-wrapper {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="success-wrapper">
+        <div class="success-icon">✓</div>
+        <h1>Booking Confirmed!</h1>
+        <p>Thank you for booking with MuseoBot</p>
+
+        <div class="booking-details">
+            <h3>Booking Details</h3>
+            <p><strong>Booking ID:</strong> {{ booking.booking_id }}</p>
+            <p><strong>Museum:</strong> {{ booking.museum }}</p>
+            <p><strong>Number of Tickets:</strong> {{ booking.tickets }}</p>
+            <p><strong>Visit Date:</strong> {{ booking.date }}</p>
+            <p><strong>Visit Time:</strong> {{ booking.time }}</p>
+            <p><strong>Amount Paid:</strong> ₹{{ booking.price }}</p>
+
+            <div class="qr-code">
+                <h4>Entry Pass QR Code</h4>
+                <img src="data:image/png;base64,{{ qr_code }}" alt="Entry QR Code">
+                <p>Show this QR code at the museum entrance</p>
+            </div>
+        </div>
+
+        <div class="buttons no-print">
+            <button onclick="window.print()" class="button">Print Ticket</button>
+            <a href="/" class="button">Return Home</a>
+        </div>
+    </div>
+</body>
+</html> 

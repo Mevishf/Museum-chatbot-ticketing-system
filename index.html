@@ -1,0 +1,1575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MuseoBot</title>
+    <style>
+        body {
+            font-family: 'Helvetica', sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: url('/static/images/Indian-Music-Museum-9.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .chat-container {
+            width: 90%;
+            max-width: 800px;
+            height: 95vh;
+            max-height: 1200px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background-color: #e63946;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.8em;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 25px;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            background-color: white;
+            padding: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-box {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: rgba(249, 249, 249, 0.9);
+            display: flex;
+            flex-direction: column;
+            scroll-behavior: smooth;
+            gap: 10px;
+        }
+
+        .chat-history {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .current-response {
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            background-color: rgba(249, 249, 249, 0.95);
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+
+        .message {
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 15px;
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+
+        .user {
+            background-color: #e63946;
+            color: white;
+            margin-left: auto;
+            border-radius: 15px 15px 0 15px;
+        }
+
+        .bot {
+            background-color: #f0f0f0;
+            color: #333;
+            margin-right: auto;
+            border-radius: 15px 15px 15px 0;
+        }
+
+        .input-area {
+            padding: 20px;
+            background-color: white;
+            display: flex;
+            gap: 10px;
+            border-top: 1px solid #eee;
+        }
+
+        input {
+            flex-grow: 1;
+            padding: 15px;
+            border: 2px solid #f4a261;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        button {
+            padding: 15px 25px;
+            background-color: #f4a261;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #e76f51;
+        }
+
+        .menu-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 15px;
+            background-color: white;
+            border-top: 1px solid #eee;
+        }
+
+        .menu-button {
+            flex: 1;
+            min-width: 150px;
+            padding: 12px;
+            background-color: #e63946;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .menu-button:hover {
+            background-color: #e76f51;
+            transform: translateY(-2px);
+        }
+
+        /* Add smooth scrollbar */
+        .chat-box::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-box::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .chat-box::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+        .chat-box::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* Add these new styles */
+        .booking-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .date-input, .time-input {
+            padding: 10px;
+            border: 2px solid #f4a261;
+            border-radius: 8px;
+            font-size: 16px;
+            background-color: white;
+            color: #333;
+            cursor: pointer;
+        }
+
+        .date-input:focus, .time-input:focus {
+            outline: none;
+            border-color: #e63946;
+        }
+
+        /* Disable Mondays in the date picker */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 4px;
+        }
+
+        .language-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .lang-button {
+            padding: 15px 30px;
+            background-color: #e63946;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 16px;
+        }
+
+        .lang-button:hover {
+            background-color: #e76f51;
+            transform: translateY(-2px);
+        }
+
+        .museum-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .museum-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .museum-option {
+            padding: 8px 15px;
+            background-color: #f4a261;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .museum-info {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+
+        .museum-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .fees-section, .events-list, .facilities-grid {
+            margin-top: 15px;
+        }
+
+        .event-card, .facility-card {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .facility-icon {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+
+        .number-picker {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .number-picker button {
+            flex: 1;
+            min-width: 40px;
+        }
+
+        .date-picker {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: 2px solid #f4a261;
+            border-radius: 8px;
+        }
+
+        .message.active {
+            opacity: 1;
+            transform: translateY(0);
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <img src="static/images/new.png" alt="MuseoBot Logo" class="logo">
+            MuseoBot - Your Museum Guide
+        </div>
+        <div class="chat-box" id="chat-box">
+            <div class="message bot">
+                Hello! I'm MuseoBot. Please select your language to begin your museum journey:<br><br>
+                <div class="language-buttons">
+                    <button onclick="selectLanguage('en')" class="lang-button">English 🇬🇧</button>
+                    <button onclick="selectLanguage('kn')" class="lang-button">ಕನ್ನಡ 🇮🇳</button>
+                    <button onclick="selectLanguage('es')" class="lang-button">Español 🇪🇸</button>
+                </div>
+            </div>
+        </div>
+        <div class="input-area">
+            <input type="text" id="user-input" placeholder="Type your message..." onkeydown="if (event.key === 'Enter') sendMessage()">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        let currentLanguage = 'en';
+        let selectedMuseum = null;
+        let currentStep = 'language';  // Track conversation step
+
+        const translations = {
+            en: {
+                welcome: "What would you like to do today?",
+                exploreMuseums: "Top 10 Museums you can explore:",
+                museumInfo: "What information do you need about %s?",
+                ticketPrompt: "How many tickets do you want to book?",
+                datePrompt: "Please select the date and time for your visit:",
+                nationalityPrompt: "Please select your nationality:",
+                invalidInput: "I didn't catch that. Can you please try again?",
+                bookingSuccess: "Your tickets have been booked successfully! You will receive a QR code shortly.",
+                indian: "Indian",
+                foreigner: "Foreigner",
+                timings: "Timings",
+                fees: "Entry Fees",
+                events: "Special Events",
+                facilities: "Facilities",
+                bookTickets: "Book Tickets",
+                exploreButton: "Explore Museums",
+                otherServices: "Other Services",
+                confirmBooking: "Please confirm your booking details:",
+                museumLabel: "Museum",
+                dateLabel: "Date",
+                timeLabel: "Time",
+                ticketsLabel: "Number of tickets",
+                proceedQuestion: "Would you like to proceed with the booking?",
+                confirm: "Confirm",
+                startOver: "Start Over",
+                timePrompt: "Please select your preferred time:",
+                selectTime: "Select Time",
+                nationalityLabel: "Nationality",
+                redirectingPayment: "Redirecting to payment page..."
+            },
+            kn: {
+                welcome: "ನೀವು ಇಂದು ಏನು ಮಾಡಲು ಬಯಸುತ್ತೀರಿ?",
+                exploreMuseums: "ನೀವು ಅನ್ವೇಷಿಸಬಹುದಾದ ಟಾಪ್ 10 ವಸ್ತುಸಂಗ್ರಹಾಲಯಗಳು:",
+                museumInfo: "%s ಬಗ್ಗೆ ನಿಮಗೆ ಯಾವ ಮಾಹಿತಿ ಬೇಕು?",
+                ticketPrompt: "ನೀವು ಎಷ್ಟು ಟಿಕೆಟ್‌ಗಳನ್ನು ಬುಕ್ ಮಾಡಲು ಬಯಸುತ್ತೀರಿ?",
+                datePrompt: "ದಯವಿಟ್ಟು ನಿಮ್ಮ ಭೇಟಿಯ ದಿನಾಂಕ ಮತ್ತು ಸಮಯವನ್ನು ಆಯ್ಕೆಮಾಡಿ:",
+                nationalityPrompt: "ದಯವಿಟ್ಟು ನಿಮ್ಮ ರಾಷ್ಟ್ರೀಯತೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ:",
+                invalidInput: "ಕ್ಷಮಿಸಿ, ನನಗೆ ಅರ್ಥವಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+                bookingSuccess: "ನಿಮ್ಮ ಟಿಕೆಟ್‌ಗಳನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಬುಕ್ ಮಾಡಲಾಗಿದೆ! ನಿಮಗೆ ಶೀಘ್ರದಲ್ಲೇ QR ಕೋಡ್ ಸ್ವೀಕರಿಸುತ್ತೀರಿ.",
+                indian: "ಭಾರತೀಯ",
+                foreigner: "ವಿದೇಶಿ",
+                timings: "ಸಮಯಗಳು",
+                fees: "ಪ್ರವೇಶ ಶುಲ್ಕ",
+                events: "ವಿಶೇಷ ಕಾರ್ಯಕ್ರಮಗಳು",
+                facilities: "ಸೌಲಭ್ಯಗಳು",
+                bookTickets: "ಟಿಕೆಟ್ ಬುಕ್ ಮಾಡಿ",
+                exploreButton: "ವಸ್ತುಸಂಗ್ರಹಾಲಯಗಳನ್ನು ಅನ್ವೇಷಿಸಿ",
+                otherServices: "ಇತರ ಸೇವೆಗಳು",
+                confirmBooking: "ದಯವಿಟ್ಟು ನಿಮ್ಮ ಬುಕ್ಕಿಂಗ್ ವಿವರಗಳನ್ನು ದೃಢೀಕರಿಸಿ:",
+                museumLabel: "ವಸ್ತುಸಂಗ್ರಹಾಲಯ",
+                dateLabel: "ದಿನಾಂಕ",
+                timeLabel: "ಸಮಯ",
+                ticketsLabel: "ಟಿಕೆಟ್‌ಗಳ ಸಂಖ್ಯೆ",
+                proceedQuestion: "ಬುಕ್ಕಿಂಗ್ ಮುಂದುವರಿಸಲು ಬಯಸುವಿರಾ?",
+                confirm: "ದೃಢೀಕರಿಸಿ",
+                startOver: "ಮತ್ತೆ ಪ್ರಾರಂಭಿಸಿ",
+                timePrompt: "ದಯವಿಟ್ಟು ನಿಮ್ಮ ಇಷ್ಟದ ಸಮಯವನ್ನು ಆಯ್ಕೆಮಾಡಿ:",
+                selectTime: "ಸಮಯ ಆಯ್ಕೆ",
+                nationalityLabel: "ರಾಷ್ಟ್ರೀಯತೆ",
+                redirectingPayment: "ಪರವತಿ ಪುಟಕ್ಕೆ ಪುನರ್ನಿರ್ದೇಶಿಸಲಾಗುತ್ತಿದೆ..."
+            },
+            kn: {
+                welcome: "ನೀವು ಇಂದು ಏನು ಮಾಡಲು ಬಯಸುತ್ತೀರಿ?",
+                exploreMuseums: "ನೀವು ಅನ್ವೇಷಿಸಬಹುದಾದ ಟಾಪ್ 10 ವಸ್ತುಸಂಗ್ರಹಾಲಯಗಳು:",
+                museumInfo: "%s ಬಗ್ಗೆ ನಿಮಗೆ ಯಾವ ಮಾಹಿತಿ ಬೇಕು?",
+                ticketPrompt: "ನೀವು ಎಷ್ಟು ಟಿಕೆಟ್‌ಗಳನ್ನು ಬುಕ್ ಮಾಡಲು ಬಯಸುತ್ತೀರಿ?",
+                datePrompt: "ದಯವಿಟ್ಟು ನಿಮ್ಮ ಭೇಟಿಯ ದಿನಾಂಕ ಮತ್ತು ಸಮಯವನ್ನು ಆಯ್ಕೆಮಾಡಿ:",
+                nationalityPrompt: "ದಯವಿಟ್ಟು ನಿಮ್ಮ ರಾಷ್ಟ್ರೀಯತೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ:",
+                invalidInput: "ಕ್ಷಮಿಸಿ, ನನಗೆ ಅರ್ಥವಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ��ನಿಸಿ.",
+                bookingSuccess: "ನಿಮ್ಮ ಟಿಕೆಟ್‌ಗಳನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಬುಕ್ ಮಾಡಲಾಗಿದೆ! ನಿಮಗೆ ಶೀಘ್ರದಲ್ಲೇ QR ಕೋಡ್ ಸ್ವೀಕರಿಸುತ್ತೀರಿ.",
+                indian: "ಭಾರತೀಯ",
+                foreigner: "ವಿ��ೇಶಿ",
+                timings: "ಸಮಯಗಳು",
+                fees: "ಪ್ರವೇಶ ಶುಲ್ಕ",
+                events: "ವಿಶೇಷ ಕಾರ್ಯಕ್ರಮಗಳು",
+                facilities: "ಸೌಲಭ್ಯಗಳು",
+                bookTickets: "ಟಿಕೆಟ್ ಬುಕ್ ಮಾಡಿ",
+                exploreButton: "ವಸ್ತುಸಂಗ್ರಹಾಲಯಗಳನ್ನು ಅನ್ವೇಷಿಸಿ",
+                otherServices: "ಇತರ ಸೇವೆಗಳು",
+                confirmBooking: "ದಯವಿಟ್ಟು ನಿಮ್ಮ ಬುಕ್ಕಿಂಗ್ ವಿವರಗಳನ್ನು ದೃಢೀಕರಿಸಿ:",
+                museumLabel: "ವಸ್ತುಸಂಗ್ರಹಾಲಯ",
+                dateLabel: "ದಿನಾಂಕ",
+                timeLabel: "ಸಮಯ",
+                ticketsLabel: "ಟಿಕೆಟ್‌ಗಳ ಸಂಖ್ಯೆ",
+                proceedQuestion: "ಬುಕ್ಕಿಂಗ್ ಮುಂದುವರಿಸಲು ಬಯಸುವಿರಾ?",
+                confirm: "ದೃಢೀಕರಿಸಿ",
+                startOver: "ಮತ್ತೆ ಪ್ರಾರಂಭಿಸಿ",
+                timePrompt: "ದಯವಿಟ್ಟು ನಿಮ್ಮ ಇಷ್ಟದ ಸಮಯವನ್ನು ಆಯ್ಕೆಮಾಡಿ:",
+                selectTime: "ಸಮಯ ಆಯ್ಕೆ",
+                nationalityLabel: "ರಾಷ್ಟ್ರೀಯತೆ",
+                redirectingPayment: "ಪರವತಿ ಪುಟಕ್ಕೆ ಪುನರ್ನಿರ್ದೇಶಿಸಲಾಗುತ್ತಿದೆ..."
+            },
+            es: {
+                welcome: "¿Qué te gustaría hacer hoy?",
+                exploreMuseums: "Los 10 mejores museos que puedes explorar:",
+                museumInfo: "¿Qué información necesitas sobre %s?",
+                ticketPrompt: "¿Cuántas entradas quieres reservar?",
+                datePrompt: "Por favor, selecciona la fecha y hora de tu visita:",
+                nationalityPrompt: "Por favor, selecciona tu nacionalidad:",
+                invalidInput: "No entendí eso. ¿Puedes intentarlo de nuevo?",
+                bookingSuccess: "¡Tus entradas han sido reservadas con éxito! Recibirás un código QR en breve.",
+                indian: "Indio",
+                foreigner: "Extranjero",
+                timings: "Horarios",
+                fees: "Tarifas de entrada",
+                events: "Eventos especiales",
+                facilities: "Instalaciones",
+                bookTickets: "Reservar entradas",
+                exploreButton: "Explorar Museos",
+                otherServices: "Otros Servicios",
+                confirmBooking: "Por favor, confirma los detalles de tu reserva:",
+                museumLabel: "Museo",
+                dateLabel: "Fecha",
+                timeLabel: "Hora",
+                ticketsLabel: "Número de entradas",
+                proceedQuestion: "¿Deseas continuar con la reserva?",
+                confirm: "Confirmar",
+                startOver: "Empezar de nuevo",
+                timePrompt: "Por favor, selecciona tu hora preferida:",
+                selectTime: "Seleccionar Hora",
+                nationalityLabel: "Nacionalidad",
+                redirectingPayment: "Redirigiendo a la página de pago..."
+            }
+        };
+
+        const detailTranslations = {
+            en: {
+                operatingHours: "Operating Hours",
+                lastEntry: "Last entry",
+                entryFees: "Entry Fees",
+                indianNationals: "Indian Nationals",
+                foreignNationals: "Foreign Nationals",
+                adults: "Adults",
+                children: "Children",
+                students: "Students",
+                specialEvents: "Special Events",
+                facilities: "Available Facilities"
+            },
+            kn: {
+                operatingHours: "ಕಾರ್ಯನಿರ್ವಹಣೆ ಸಮಯ",
+                lastEntry: "ಕೊನೆಯ ಪ್ರವೇಶ",
+                entryFees: "ಪ್ರವೇಶ ಶುಲ್ಕ",
+                indianNationals: "ಭಾರತೀಯ ನಾಗರಿಕರು",
+                foreignNationals: "ವಿದೇಶಿ ನಾಗರಿಕರು",
+                adults: "ವಯಸ್ಕರು",
+                children: "ಮಕ್ಕಳು",
+                students: "ವಿದ್ಯಾರ್ಥಿಗಳು",
+                specialEvents: "ವಿಶೇಷ ಕಾರ್ಯಕ್ರಮಗಳು",
+                facilities: "ಲಭ್ಯವಿರುವ ಸೌಲಭ್ಯಗಳು"
+            },
+            es: {
+                operatingHours: "Horario de Apertura",
+                lastEntry: "Última entrada",
+                entryFees: "Tarifas de Entrada",
+                indianNationals: "Ciudadanos Indios",
+                foreignNationals: "Extranjeros",
+                adults: "Adultos",
+                children: "Niños",
+                students: "Estudiantes",
+                specialEvents: "Eventos Especiales",
+                facilities: "Instalaciones Disponibles"
+            }
+        };
+
+        function selectLanguage(lang) {
+            currentLanguage = lang;
+            const chatBox = document.getElementById("chat-box");
+            
+            // Show selected language as user's choice
+            chatBox.innerHTML += `<div class="message user">${getLanguageName(lang)}</div>`;
+            
+            // Show welcome message in selected language
+            chatBox.innerHTML += `<div class="message bot">${translations[lang].welcome}</div>`;
+            
+            // Show initial options in a chat bubble instead
+            chatBox.innerHTML += `
+                <div class="message bot">
+                    <div class="menu-buttons">
+                        <button class="menu-button" onclick="showMuseums()">${translations[lang].exploreButton}</button>
+                        <button class="menu-button" onclick="showOtherServices()">${translations[lang].otherServices}</button>
+                    </div>
+                </div>
+            `;
+            scrollToBottom();
+        }
+
+        function getLanguageName(code) {
+            const names = {
+                'en': 'English',
+                'kn': 'ಕನ್ನಡ',
+                'es': 'Español'
+            };
+            return names[code];
+        }
+
+        function showMuseums() {
+            const chatBox = document.getElementById("chat-box");
+            const history = chatBox.innerHTML;
+            
+            const museums = [
+                {
+                    name: "HAL Heritage Centre and Aerospace Museum",
+                    id: "hal"
+                },
+                {
+                    name: "Government Museum",
+                    id: "govt"
+                },
+                {
+                    name: "Visvesvaraya Industrial & Technological Museum",
+                    id: "vitm"
+                },
+                {
+                    name: "Indian Music Experience Museum",
+                    id: "music"
+                },
+                {
+                    name: "Dr. Ambedkar Museum",
+                    id: "ambedkar"
+                },
+                {
+                    name: "Folk Museum (Janapada Loka)",
+                    id: "folk"
+                },
+                {
+                    name: "NIMHANS Brain Museum",
+                    id: "brain"
+                },
+                {
+                    name: "Kempegowda Museum",
+                    id: "kempegowda"
+                },
+                {
+                    name: "Karnataka Chitrakala Parishath",
+                    id: "art"
+                },
+                {
+                    name: "National Gallery of Modern Art",
+                    id: "ngma"
+                }
+            ];
+            
+            // Create museum list with buttons
+            let museumButtons = `
+                <div class="chat-history">${history}</div>
+                <div class="current-response">
+                    <div class="message bot">
+                        Top 10 Museums in Bangalore:
+                        <div class="museum-buttons" style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
+            `;
+            
+            museums.forEach((museum, index) => {
+                museumButtons += `
+                    <button 
+                        onclick="handleMuseumChoice('${museum.id}')" 
+                        class="menu-button" 
+                        style="width: 100%; text-align: left; padding: 15px; margin: 5px 0;">
+                        ${index + 1}. ${museum.name}
+                    </button>
+                `;
+            });
+            
+            museumButtons += `</div></div>`;
+            
+            // Replace content instead of appending
+            chatBox.innerHTML = museumButtons;
+            scrollToBottom();
+        }
+
+        function showOtherServices() {
+            const chatBox = document.getElementById("chat-box");
+            const initialOptions = document.getElementById("initial-options");
+            
+            // Show user's choice
+            chatBox.innerHTML += `<div class="message user">Other Services</div>`;
+            
+            // Hide the initial options
+            initialOptions.style.display = 'none';
+            
+            // Show other services options
+            // Add your other services content here
+        }
+
+        // Add this function to handle menu choices
+        function handleMenuChoice(type) {
+            const chatBox = document.getElementById("chat-box");
+            
+            // Show user's selection
+            chatBox.innerHTML += `<div class="message user">${translations[currentLanguage][type]}</div>`;
+            
+            // Handle different menu options
+            if (type === 'book') {
+                startBookingProcess(selectedMuseum);
+            } else {
+                handleMuseumDetails(selectedMuseum, type);
+            }
+            scrollToBottom();
+        }
+
+        // Update handleMuseumChoice to store the selected museum
+        function handleMuseumChoice(museumId) {
+            const chatBox = document.getElementById("chat-box");
+            selectedMuseum = museumId;
+            const museums = {
+                hal: "HAL Heritage Centre and Aerospace Museum",
+                govt: "Government Museum",
+                vitm: "Visvesvaraya Industrial & Technological Museum",
+                music: "Indian Music Experience Museum",
+                ambedkar: "Dr. Ambedkar Museum",
+                folk: "Folk Museum (Janapada Loka)",
+                brain: "NIMHANS Brain Museum",
+                kempegowda: "Kempegowda Museum",
+                art: "Karnataka Chitrakala Parishath",
+                ngma: "National Gallery of Modern Art"
+            };
+
+            // Keep chat history
+            const history = chatBox.innerHTML;
+            chatBox.innerHTML = `
+                <div class="chat-history">${history}</div>
+                <div class="current-response">
+                    <div class="message bot active">
+                        ${translations[currentLanguage].museumInfo.replace('%s', museums[museumId])}
+                        <div class="menu-buttons" style="margin-top: 10px;">
+                            <button class="menu-button" onclick="handleMenuChoice('timings')">${translations[currentLanguage].timings}</button>
+                            <button class="menu-button" onclick="handleMenuChoice('fees')">${translations[currentLanguage].fees}</button>
+                            <button class="menu-button" onclick="handleMenuChoice('events')">${translations[currentLanguage].events}</button>
+                            <button class="menu-button" onclick="handleMenuChoice('book')">${translations[currentLanguage].bookTickets}</button>
+                            <button class="menu-button" onclick="handleMenuChoice('facilities')">${translations[currentLanguage].facilities}</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            scrollToBottom();
+        }
+
+        // Rest of your existing functions...
+
+        const museumDetails = {
+            hal: {
+                name: {
+                    en: "HAL Heritage Centre and Aerospace Museum",
+                    kn: "ಹೆಚ್‌ಎಎಲ್ ಪರಂಪರೆ ಕೇಂದ್ರ ಮತ್ತು ವೈಮಾನಿಕ ವಸ್ತುಸಂಗ್ರಹಾಲಯ",
+                    es: "Centro de Patrimonio HAL y Museo Aeroespacial"
+                },
+                timings: {
+                    regular: {
+                        en: "Tuesday to Sunday: 9:00 AM to 5:00 PM",
+                        kn: "ಮಂಗಳವಾರದಿಂದ ಭಾನುವಾರದವರೆಗೆ: ಬೆಳಿಗ್ಗೆ 9:00 ರಿಂದ ಸಂಜೆ 5:00 ರವರೆಗೆ",
+                        es: "Martes a domingo: 9:00 AM a 5:00 PM"
+                    },
+                    holidays: {
+                        en: "Closed on Mondays and National Holidays",
+                        kn: "ಸೋಮವಾರ ಮತ್ತು ರಾಷ್ಟ್ರೀಯ ರಜಾದಿನಗಳಂದು ಮುಚ್ಚಿರುತ್ತದೆ",
+                        es: "Cerrado los lunes y festivos nacionales"
+                    },
+                    lastEntry: {
+                        en: "Last entry at 4:00 PM",
+                        kn: "ಕೊನೆಯ ಪ್ರವೇಶ ಸಂಜೆ 4:00 ಗಂಟೆಗೆ",
+                        es: "Última entrada a las 4:00 PM"
+                    }
+                },
+                fees: {
+                    indian: {
+                        adult: {
+                            en: "₹50",
+                            kn: "₹50",
+                            es: "₹50"
+                        },
+                        child: {
+                            en: "₹30",
+                            kn: "₹30",
+                            es: "₹30"
+                        },
+                        student: {
+                            en: "₹25 (with valid ID)",
+                            kn: "₹25 (ಮಾನ್ಯ ಐಡಿಯೊಂದಿಗೆ)",
+                            es: "₹25 (con identificación válida)"
+                        }
+                    },
+                    foreign: {
+                        // Similar structure for foreign visitors
+                    }
+                },
+                events: [
+                    {
+                        name: {
+                            en: "Aircraft Engine Display",
+                            kn: "ವಿಮಾನ ಎಂಜಿನ್ ಪ್ರದರ್ಶನ",
+                            es: "Exposición de Motores de Aeronaves"
+                        },
+                        date: {
+                            en: "Permanent Exhibition",
+                            kn: "ಶ್ವತ ಪ್ರದರ್ಶನ",
+                            es: "Exposición Permanente"
+                        },
+                        description: {
+                            en: "See real aircraft engines up close",
+                            kn: "ನಿ�����ಾದ ವಿಮಾನ ಎಂಜಿನ್ಗಳನ್ನು ಹತ್ತಿರದಿಂದ ನೋಡಿ",
+                            es: "Ver motores de aviones reales de cerca"
+                        }
+                    }
+                ],
+                facilities: [
+                    {
+                        name: {
+                            en: "Parking",
+                            kn: "ಪಾರ್ಕಿಂಗ್",
+                            es: "Estacionamiento"
+                        },
+                        description: {
+                            en: "Free parking available",
+                            kn: "ಉಚಿತ ಪಾರ್ಕಿಂಗ್ ಲಭ್ಯವಿದೆ",
+                            es: "Estacionamiento gratuito disponible"
+                        },
+                        icon: "🅿️"
+                    }
+                ]
+            },
+            vitm: {
+                name: {
+                    en: "Visvesvaraya Industrial & Technological Museum",
+                    kn: "ವಿಶ್ವೇಶ್ವರಯ್ಯ ಕೈಗಾರಿಕಾ ಮತ್ತು ತಾಂತ್ರಿಕ ವಸ್ತುಸಂಗ್ರಹಾಲಯ",
+                    es: "Museo Industrial y Tecnológico Visvesvaraya"
+                },
+                timings: {
+                    regular: {
+                        en: "All days: 9:30 AM to 6:00 PM",
+                        kn: "ಎಲ್ಲಾ ದಿನಗಳು: ಬೆಳಿಗ್ಗೆ 9:30 ರಿಂದ ಸಂಜೆ 6:00 ರವರೆಗೆ",
+                        es: "Todos los días: 9:30 AM a 6:00 PM"
+                    },
+                    holidays: {
+                        en: "Open on all days except Ganesha Chaturthi and Deepavali",
+                        kn: "ಗಣೇಶ ಚತುರ್ಥಿ ಮತ್ತು ದೀಪಾವಳಿ ಹೊರತುಪಡಿಸಿ ಎಲ್ಲಾ ದಿನಗಳಲ್ಲೂ ತೆರೆದಿರುತ್ತದೆ",
+                        es: "Abierto todos los días excepto Ganesha Chaturthi y Deepavali"
+                    },
+                    lastEntry: {
+                        en: "Last entry at 5:30 PM",
+                        kn: "ಕೊನೆಯ ಪ್ರವೇಶ ಸಂಜೆ 5:30 ಕ್ಕೆ",
+                        es: "Última entrada a las 5:30 PM"
+                    }
+                },
+                fees: {
+                    indian: {
+                        adult: {
+                            en: "₹60",
+                            kn: "₹60",
+                            es: "₹60"
+                        },
+                        child: {
+                            en: "₹30",
+                            kn: "₹30",
+                            es: "₹30"
+                        },
+                        student: {
+                            en: "₹30 (with valid ID)",
+                            kn: "₹30 (ಮಾನ್ಯ ಐಡಿಯೊಂದಿಗೆ)",
+                            es: "₹30 (con identificación válida)"
+                        }
+                    },
+                    foreign: {
+                        adult: {
+                            en: "₹600",
+                            kn: "₹600",
+                            es: "₹600"
+                        },
+                        child: {
+                            en: "₹300",
+                            kn: "₹300",
+                            es: "₹300"
+                        },
+                        student: {
+                            en: "₹300",
+                            kn: "₹300",
+                            es: "₹300"
+                        }
+                    }
+                },
+                events: [
+                    {
+                        name: {
+                            en: "Science Demo Shows",
+                            kn: "ವಿಜ್ಞಾನ ಪ್ರದರ್ಶನಗಳು",
+                            es: "Demostraciones Científicas"
+                        },
+                        date: {
+                            en: "Daily",
+                            kn: "ಪ್ರತಿದಿನ",
+                            es: "Diariamente"
+                        },
+                        description: {
+                            en: "Interactive science demonstrations",
+                            kn: "ಸಂವಾದಾತ್ಮಕ ವಿಜ್ಞಾನ ಪ್ರದರ್ಶನಗಳು",
+                            es: "Demostraciones científicas interactivas"
+                        }
+                    },
+                    {
+                        name: {
+                            en: "3D Film Shows",
+                            kn: "3D ಚಲನಚಿತ್ರ ಪ್ರದರ್ಶನಗಳು",
+                            es: "Películas en 3D"
+                        },
+                        date: {
+                            en: "Hourly",
+                            kn: "ಪ್ರತಿ ಗಂಟೆಗೆ",
+                            es: "Cada hora"
+                        },
+                        description: {
+                            en: "Educational 3D movies",
+                            kn: "ಶೈಕ್ಷಣಿಕ 3D ಚಲನಚಿತ್ರಗಳು",
+                            es: "Películas educativas en 3D"
+                        }
+                    }
+                ],
+                facilities: [
+                    {
+                        name: {
+                            en: "Cafeteria",
+                            kn: "ಉಪಹಾರ ಗೃಹ",
+                            es: "Cafetería"
+                        },
+                        description: {
+                            en: "Food court available",
+                            kn: "ಆಹಾರ ಕೋರ್ಟ್ ಲಭ್ಯವಿದೆ",
+                            es: "Patio de comidas disponible"
+                        },
+                        icon: "☕"
+                    },
+                    {
+                        name: {
+                            en: "Gift Shop",
+                            kn: "ಉಡುಗೊರೆ ಅಂಗಡಿ",
+                            es: "Tienda de Regalos"
+                        },
+                        description: {
+                            en: "Science toys and souvenirs",
+                            kn: "ವಿಜ್ಞಾನ ಆಟಿಕೆಗಳು ಮತ್ತು ಸ್ಮರಣಿಕೆಗಳು",
+                            es: "Juguetes científicos y recuerdos"
+                        },
+                        icon: "🛍️"
+                    }
+                ]
+            },
+            music: {
+                name: {
+                    en: "Indian Music Experience Museum",
+                    kn: "ಭಾರತೀಯ ಸಂಗೀತ ಅನುಭವ ವಸ್ತುಸಂಗ್ರಹಾಲಯ",
+                    es: "Museo de la Experiencia Musical India"
+                },
+                timings: {
+                    regular: {
+                        en: "Tuesday to Sunday: 10:00 AM to 6:00 PM",
+                        kn: "ಮಂಗಳವಾರದಿಂದ ಭಾನುವಾರದವರೆಗೆ: ಬೆಳಿಗ್ಗೆ 10:00 ರಿಂದ ಸಂಜೆ 6:00 ರವರೆಗೆ",
+                        es: "Martes a domingo: 10:00 AM a 6:00 PM"
+                    },
+                    holidays: {
+                        en: "Closed on Mondays",
+                        kn: "ಸೋಮವಾರ ಮುಚ್ಚಿರುತ್ತದೆ",
+                        es: "Cerrado los lunes"
+                    },
+                    lastEntry: {
+                        en: "Last entry at 5:00 PM",
+                        kn: "ಕೊನೆಯ ಪ್ರವೇಶ ಸಂಜೆ 5:00 ಕ್ಕೆ",
+                        es: "Última entrada a las 5:00 PM"
+                    }
+                },
+                fees: {
+                    indian: {
+                        adult: {
+                            en: "₹250",
+                            kn: "₹250",
+                            es: "₹250"
+                        },
+                        child: {
+                            en: "₹100",
+                            kn: "₹100",
+                            es: "₹100"
+                        },
+                        student: {
+                            en: "₹100",
+                            kn: "₹100",
+                            es: "₹100"
+                        }
+                    },
+                    foreign: {
+                        adult: {
+                            en: "₹500",
+                            kn: "₹500",
+                            es: "₹500"
+                        },
+                        child: {
+                            en: "₹250",
+                            kn: "₹250",
+                            es: "₹250"
+                        },
+                        student: {
+                            en: "₹250",
+                            kn: "₹250",
+                            es: "₹250"
+                        }
+                    }
+                },
+                events: [
+                    {
+                        name: {
+                            en: "Sound Garden",
+                            kn: "ಧ್ವನಿ ಉದ್ಯಾನ",
+                            es: "Jardín del Sonido"
+                        },
+                        date: {
+                            en: "Daily",
+                            kn: "ಪ್ರತಿದಿನ",
+                            es: "Diariamente"
+                        },
+                        description: {
+                            en: "Interactive musical instruments",
+                            kn: "ಸಂವಾದಾತ್ಮಕ ಸಂಗೀತ ವಾದ್ಯಗಳು",
+                            es: "Instrumentos musicales interactivos"
+                        }
+                    }
+                ],
+                facilities: [
+                    {
+                        name: {
+                            en: "Recording Studio",
+                            kn: "ರೆಕಾರ್ಡಿಂಗ್ ಸ್ಟುಡಿಯೋ",
+                            es: "Estudio de Grabación"
+                        },
+                        description: {
+                            en: "Professional recording facility",
+                            kn: "ವೃತ್ತಿಪರ ರೆಕಾರ್ಡಿಂಗ್ ಸೌಲಭ್ಯ",
+                            es: "Instalación de grabación profesional"
+                        },
+                        icon: "🎙️"
+                    }
+                ]
+            },
+            govt: {
+                name: {
+                    en: "Government Museum",
+                    kn: "ಸರ್ಕಾರಿ ವಸ್ತುಸಂಗ್ರಹಾಲಯ",
+                    es: "Museo Gubernamental"
+                },
+                timings: {
+                    regular: {
+                        en: "Tuesday to Sunday: 10:00 AM to 5:30 PM",
+                        kn: "ಮಂಗಳವಾರದಿಂದ ಭಾನುವಾರದವರೆಗೆ: ಬೆಳಿಗ್ಗೆ 10:00 ರಿಂದ ಸಂಜೆ 5:30 ರವರೆಗೆ",
+                        es: "Martes a domingo: 10:00 AM a 5:30 PM"
+                    },
+                    holidays: {
+                        en: "Closed on Mondays and Government Holidays",
+                        kn: "ಸೋಮವಾರ ಮತ್ತು ಸರ್ಕಾರಿ ರಜಾದಿನಗಳಂದು ಮುಚ್ಚಿರುತ್ತದೆ",
+                        es: "Cerrado los lunes y festivos gubernamentales"
+                    },
+                    lastEntry: {
+                        en: "Last entry at 5:00 PM",
+                        kn: "ಕೊನೆಯ ಪ್ರವೇಶ ಸಂಜೆ 5:00 ಕ್ಕೆ",
+                        es: "Última entrada a las 5:00 PM"
+                    }
+                },
+                fees: {
+                    indian: {
+                        adult: {
+                            en: "₹20",
+                            kn: "₹20",
+                            es: "₹20"
+                        },
+                        child: {
+                            en: "₹10",
+                            kn: "₹10",
+                            es: "₹10"
+                        },
+                        student: {
+                            en: "₹10",
+                            kn: "₹10",
+                            es: "₹10"
+                        }
+                    },
+                    foreign: {
+                        adult: {
+                            en: "₹200",
+                            kn: "₹200",
+                            es: "₹200"
+                        },
+                        child: {
+                            en: "₹100",
+                            kn: "₹100",
+                            es: "₹100"
+                        },
+                        student: {
+                            en: "₹100",
+                            kn: "₹100",
+                            es: "₹100"
+                        }
+                    }
+                },
+                events: [
+                    {
+                        name: {
+                            en: "Archaeological Gallery",
+                            kn: "ಪುರಾತತ್ವ ಗ್ಯಾಲರಿ",
+                            es: "Galería Arqueológica"
+                        },
+                        date: {
+                            en: "Permanent Exhibition",
+                            kn: "ಶಾಶ್ವತ ಪ್ರದರ್ಶನ",
+                            es: "Exposición Permanente"
+                        },
+                        description: {
+                            en: "Ancient artifacts and sculptures",
+                            kn: "ಪ್ರಾಚೀನ ಕಲಾಕೃತಿಗಳು ಮತ್ತು ಶಿಲ್ಪಗಳು",
+                            es: "Artefactos y esculturas antiguas"
+                        }
+                    }
+                ],
+                facilities: [
+                    {
+                        name: {
+                            en: "Guide Service",
+                            kn: "ಮಾರ್ಗದರ್ಶಿ ಸೇವೆ",
+                            es: "Servicio de Guía"
+                        },
+                        description: {
+                            en: "Available in multiple languages",
+                            kn: "ಹಲವಾರು ಭಾಷೆಗಳಲ್ಲಿ ಲಭ್ಯವಿದೆ",
+                            es: "Disponible en varios idiomas"
+                        },
+                        icon: "🎤"
+                    }
+                ]
+            },
+            brain: {
+                name: {
+                    en: "NIMHANS Brain Museum",
+                    kn: "ನಿಮ್ಹಾನ್ಸ್ ಮೆದುಳು ವಸ್ತುಸಂಗ್ರಹಾಲಯ",
+                    es: "Museo del Cerebro NIMHANS"
+                },
+                timings: {
+                    regular: {
+                        en: "Monday to Saturday: 10:00 AM to 3:30 PM",
+                        kn: "ಸೋಮವಾರದಿಂದ ಶನಿವಾರದವರೆಗೆ: ಬೆಳಿಗ್ಗೆ 10:00 ರಿಂದ ಮಧ್ಯಾಹ್ನ 3:30 ರವರೆಗೆ",
+                        es: "Lunes a sábado: 10:00 AM a 3:30 PM"
+                    },
+                    holidays: {
+                        en: "Closed on Sundays and Public Holidays",
+                        kn: "ಭಾನುವಾರ ಮತ್ತು ಸಾರ್ವಜನಿಕ ರಜಾದಿನಗಳಂದು ಮುಚ್ಚಿರುತ್ತದೆ",
+                        es: "Cerrado los domingos y festivos"
+                    },
+                    lastEntry: {
+                        en: "Last entry at 3:00 PM",
+                        kn: "ಕೊನೆಯ ಪ್ರವೇಶ ಮಧ್ಯಾಹ್ನ 3:00 ಕ್ಕೆ",
+                        es: "Última entrada a las 3:00 PM"
+                    }
+                },
+                fees: {
+                    indian: {
+                        adult: {
+                            en: "Free",
+                            kn: "ಉಚಿತ",
+                            es: "Gratis"
+                        },
+                        child: {
+                            en: "Free",
+                            kn: "ಉಚಿತ",
+                            es: "Gratis"
+                        },
+                        student: {
+                            en: "Free",
+                            kn: "ಉಚಿತ",
+                            es: "Gratis"
+                        }
+                    },
+                    foreign: {
+                        adult: {
+                            en: "Free",
+                            kn: "ಉಚಿತ",
+                            es: "Gratis"
+                        },
+                        child: {
+                            en: "Free",
+                            kn: "ಉಚಿತ",
+                            es: "Gratis"
+                        },
+                        student: {
+                            en: "Free",
+                            kn: "ಉಚಿತ",
+                            es: "Gratis"
+                        }
+                    }
+                },
+                events: [
+                    {
+                        name: {
+                            en: "Brain Awareness Week",
+                            kn: "ಮೆದುಳು ಜಾಗೃತಿ ವಾರ",
+                            es: "Semana de Concientización sobre el Cerebro"
+                        },
+                        date: {
+                            en: "March (Annual)",
+                            kn: "ಮಾರ್ಚ್ (ವಾರ್ಷಿಕ)",
+                            es: "Marzo (Anual)"
+                        },
+                        description: {
+                            en: "Special exhibitions and lectures",
+                            kn: "ವಿಶೇಷ ಪ್ರದರ್ಶನಗಳು ಮತ್ತು ಉಪನ್ಯಾಸಗಳು",
+                            es: "Exposiciones especiales y conferencias"
+                        }
+                    }
+                ],
+                facilities: [
+                    {
+                        name: {
+                            en: "Guided Tours",
+                            kn: "ಮಾರ್ಗದರ್ಶಿ ಪ್ರವಾಸಗಳು",
+                            es: "Visitas Guiadas"
+                        },
+                        description: {
+                            en: "Expert-led tours available",
+                            kn: "ತಜ್ಞರ ಮಾರ್ಗದರ್ಶನದಲ್ಲಿ ಪ್ರವಾಸಗಳು ಲಭ್ಯವಿದೆ",
+                            es: "Visitas guiadas por expertos disponibles"
+                        },
+                        icon: "👥"
+                    }
+                ]
+            },
+            folk: {
+                name: {
+                    en: "Folk Museum (Janapada Loka)",
+                    kn: "ಜಾನಪದ ಲೋಕ",
+                    es: "Museo Folclórico (Janapada Loka)"
+                },
+                timings: {
+                    regular: {
+                        en: "Tuesday to Sunday: 9:30 AM to 5:30 PM",
+                        kn: "ಮಂಗಳವಾರದಿಂದ ಭಾನುವಾರದವರೆಗೆ: ಬೆಳಿಗ್ಗೆ 9:30 ರಿಂದ ಸಂಜೆ 5:30 ರವರೆಗೆ",
+                        es: "Martes a domingo: 9:30 AM a 5:30 PM"
+                    },
+                    holidays: {
+                        en: "Closed on Mondays",
+                        kn: "ಸೋಮವಾರ ಮುಚ್ಚಿರುತ್ತದೆ",
+                        es: "Cerrado los lunes"
+                    },
+                    lastEntry: {
+                        en: "Last entry at 5:00 PM",
+                        kn: "ಕೊನೆಯ ಪ್ರವೇಶ ಸಂಜೆ 5:00 ಕ್ಕೆ",
+                        es: "Última entrada a las 5:00 PM"
+                    }
+                },
+                fees: {
+                    indian: {
+                        adult: {
+                            en: "₹50",
+                            kn: "₹50",
+                            es: "₹50"
+                        },
+                        child: {
+                            en: "₹25",
+                            kn: "₹25",
+                            es: "₹25"
+                        },
+                        student: {
+                            en: "₹25 (with valid ID)",
+                            kn: "₹25 (ಮಾನ್ಯ ಐಡಿಯೊಂದಿಗೆ)",
+                            es: "₹25 (con identificación válida)"
+                        }
+                    },
+                    foreign: {
+                        adult: {
+                            en: "₹200",
+                            kn: "₹200",
+                            es: "₹200"
+                        },
+                        child: {
+                            en: "₹100",
+                            kn: "₹100",
+                            es: "₹100"
+                        },
+                        student: {
+                            en: "₹100",
+                            kn: "₹100",
+                            es: "₹100"
+                        }
+                    }
+                },
+                events: [
+                    {
+                        name: {
+                            en: "Folk Dance Performance",
+                            kn: "ಜಾನಪದ ನೃತ್ಯ ಪ್ರದರ್ಶನ",
+                            es: "Espectáculo de Danza Folclórica"
+                        },
+                        date: {
+                            en: "Weekends",
+                            kn: "ವಾರಾಂತ್ಯಗಳಲ್ಲಿ",
+                            es: "Fines de semana"
+                        },
+                        description: {
+                            en: "Traditional folk dance performances",
+                            kn: "ಸಾಂಪ್ರದಾಯಿಕ ಜಾನಪದ ನೃತ್ಯ ಪ್ರದರ್ಶನಗಳು",
+                            es: "Actuaciones de danza folclórica tradicional"
+                        }
+                    }
+                ],
+                facilities: [
+                    {
+                        name: {
+                            en: "Craft Shop",
+                            kn: "ಕರಕುಶಲ ಅಂಗಡಿ",
+                            es: "Tienda de Artesanía"
+                        },
+                        description: {
+                            en: "Traditional handicrafts for sale",
+                            kn: "ಸಾಂಪ್ರದಾಯಿಕ ಕರಕುಶಲ ವಸ್ತುಗಳ ಮಾರಾಟ",
+                            es: "Artesanías tradicionales a la venta"
+                        },
+                        icon: "🛍️"
+                    }
+                ]
+            }
+        };
+
+        function handleMuseumDetails(museumId, type) {
+            const chatBox = document.getElementById("chat-box");
+            const museum = museumDetails[museumId];
+            const t = detailTranslations[currentLanguage];
+
+            if (!museum) {
+                chatBox.innerHTML += `
+                    <div class="message bot">
+                        Sorry, details for this museum are not available at the moment.
+                    </div>
+                `;
+                return;
+            }
+
+            let response = '';
+            switch(type) {
+                case 'timings':
+                    response = `
+                        <div class="museum-info">
+                            <h3>${t.operatingHours}</h3>
+                            <p>${museum.timings.regular[currentLanguage]}</p>
+                            <p>${museum.timings.holidays[currentLanguage]}</p>
+                            <p><small>${t.lastEntry}: ${museum.timings.lastEntry[currentLanguage]}</small></p>
+                        </div>
+                    `;
+                    break;
+                case 'fees':
+                    response = `
+                        <div class="museum-info">
+                            <h3>${t.entryFees}</h3>
+                            <div class="fees-section">
+                                <h4>${t.indianNationals}</h4>
+                                <ul>
+                                    <li>${t.adults}: ${museum.fees.indian.adult[currentLanguage]}</li>
+                                    <li>${t.children}: ${museum.fees.indian.child[currentLanguage]}</li>
+                                    <li>${t.students}: ${museum.fees.indian.student[currentLanguage]}</li>
+                                </ul>
+                                <h4>${t.foreignNationals}</h4>
+                                <ul>
+                                    <li>${t.adults}: ${museum.fees.foreign.adult[currentLanguage]}</li>
+                                    <li>${t.children}: ${museum.fees.foreign.child[currentLanguage]}</li>
+                                    <li>${t.students}: ${museum.fees.foreign.student[currentLanguage]}</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'events':
+                    response = `
+                        <div class="museum-info">
+                            <h3>${t.specialEvents}</h3>
+                            <div class="events-list">
+                                ${museum.events.map(event => `
+                                    <div class="event-card">
+                                        <h4>${event.name[currentLanguage]}</h4>
+                                        <p>${event.description[currentLanguage]}</p>
+                                        <small>${event.date[currentLanguage]}</small>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'facilities':
+                    response = `
+                        <div class="museum-info">
+                            <h3>${t.facilities}</h3>
+                            <div class="facilities-grid">
+                                ${museum.facilities.map(facility => `
+                                    <div class="facility-card">
+                                        <span class="facility-icon">${facility.icon}</span>
+                                        <h4>${facility.name[currentLanguage]}</h4>
+                                        <p>${facility.description[currentLanguage]}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                    break;
+            }
+
+            chatBox.innerHTML += `<div class="message bot">${response}</div>`;
+            scrollToBottom();
+        }
+
+        function startBookingProcess(museumId) {
+            const chatBox = document.getElementById("chat-box");
+            const museum = museumDetails[museumId];
+            
+            chatBox.innerHTML += `
+                <div class="message bot">
+                    How many tickets would you like to book for ${museum.name[currentLanguage]}?
+                    <div class="number-picker">
+                        <button onclick="selectTickets(1)">1</button>
+                        <button onclick="selectTickets(2)">2</button>
+                        <button onclick="selectTickets(3)">3</button>
+                        <button onclick="selectTickets(4)">4</button>
+                        <button onclick="selectTickets(5)">5</button>
+                        <input type="number" min="1" max="20" placeholder="Other" onchange="selectTickets(this.value)">
+                    </div>
+                </div>
+            `;
+            scrollToBottom();
+        }
+
+        function selectTickets(quantity) {
+            const chatBox = document.getElementById("chat-box");
+            const t = translations[currentLanguage];
+            // Show user's selection
+            chatBox.innerHTML += `<div class="message user">${quantity} ${t.ticketsLabel}</div>`;
+            
+            // Store quantity and show date picker
+            window.ticketQuantity = quantity;
+            showDatePicker();
+        }
+
+        function showDatePicker() {
+            const chatBox = document.getElementById("chat-box");
+            const today = new Date().toISOString().split('T')[0];
+            
+            chatBox.innerHTML += `
+                <div class="message bot">
+                    Please select your visit date:
+                    <input type="date" min="${today}" onchange="handleDateSelection(this.value)" class="date-picker">
+                </div>
+            `;
+            scrollToBottom();
+        }
+
+        function handleDateSelection(date) {
+            const chatBox = document.getElementById("chat-box");
+            const t = translations[currentLanguage];
+            // Format and show user's date selection
+            const formattedDate = new Date(date).toLocaleDateString(
+                currentLanguage === 'en' ? 'en-US' : 
+                currentLanguage === 'kn' ? 'kn-IN' : 
+                'es-ES',
+                { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                }
+            );
+            chatBox.innerHTML += `<div class="message user">${t.dateLabel}: ${formattedDate}</div>`;
+            
+            window.selectedDate = date;
+            // Show time selection after date
+            chatBox.innerHTML += `
+                <div class="message bot">
+                    ${t.timePrompt}
+                    <select onchange="handleTimeSelection(this.value)" class="time-input">
+                        <option value="">${t.selectTime}</option>
+                        <option value="10:00">10:00 AM</option>
+                        <option value="11:00">11:00 AM</option>
+                        <option value="12:00">12:00 PM</option>
+                        <option value="13:00">1:00 PM</option>
+                        <option value="14:00">2:00 PM</option>
+                        <option value="15:00">3:00 PM</option>
+                        <option value="16:00">4:00 PM</option>
+                        <option value="17:00">5:00 PM</option>
+                    </select>
+                </div>
+            `;
+            scrollToBottom();
+        }
+
+        function handleTimeSelection(time) {
+            const chatBox = document.getElementById("chat-box");
+            const t = translations[currentLanguage];
+            
+            // Show user's time selection
+            chatBox.innerHTML += `<div class="message user">${t.timeLabel}: ${time}</div>`;
+            
+            window.selectedTime = time;
+            const museum = museumDetails[selectedMuseum];
+            const dateObj = new Date(window.selectedDate);
+            const formattedDate = dateObj.toLocaleDateString(
+                currentLanguage === 'en' ? 'en-US' : 
+                currentLanguage === 'kn' ? 'kn-IN' : 
+                'es-ES', 
+                { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                }
+            );
+            
+            // Show booking confirmation
+            chatBox.innerHTML += `
+                <div class="message bot">
+                    ${t.confirmBooking}<br><br>
+                    ${t.museumLabel}: ${museum.name[currentLanguage]}<br>
+                    ${t.dateLabel}: ${formattedDate}<br>
+                    ${t.timeLabel}: ${time}<br>
+                    ${t.ticketsLabel}: ${window.ticketQuantity}<br><br>
+                    ${t.proceedQuestion}
+                    <div class="menu-buttons" style="margin-top: 10px;">
+                        <button class="menu-button" onclick="showNationalitySelection()">${t.confirm}</button>
+                        <button class="menu-button" onclick="startBookingProcess('${selectedMuseum}')">${t.startOver}</button>
+                    </div>
+                </div>
+            `;
+            scrollToBottom();
+        }
+
+        function showNationalitySelection() {
+            const chatBox = document.getElementById("chat-box");
+            
+            // Show nationality selection
+            chatBox.innerHTML += `
+                <div class="message bot">
+                    ${translations[currentLanguage].nationalityPrompt}
+                    <div class="menu-buttons" style="margin-top: 10px;">
+                        <button class="menu-button" onclick="completeBooking('indian')">${translations[currentLanguage].indian}</button>
+                        <button class="menu-button" onclick="completeBooking('foreign')">${translations[currentLanguage].foreigner}</button>
+                    </div>
+                </div>
+            `;
+            scrollToBottom();
+        }
+
+        function completeBooking(nationality) {
+            const chatBox = document.getElementById("chat-box");
+            const t = translations[currentLanguage];
+            const museum = museumDetails[selectedMuseum];
+            
+            // Show user's nationality selection
+            chatBox.innerHTML += `<div class="message user">${t.nationalityLabel}: ${t[nationality]}</div>`;
+            chatBox.innerHTML += `<div class="message bot">${t.redirectingPayment}</div>`;
+            
+            // Calculate price based on nationality and museum
+            const price = calculatePrice(selectedMuseum, nationality);
+            
+            // Redirect to payment page with all booking details
+            window.location.href = `/payment?` + new URLSearchParams({
+                museum: selectedMuseum,
+                museum_name: museum.name[currentLanguage],
+                number_of_people: window.ticketQuantity,
+                nationality: nationality,
+                date: window.selectedDate,
+                time: window.selectedTime,
+                price: price,
+                language: currentLanguage
+            });
+        }
+
+        function calculatePrice(museumId, nationality) {
+            const museum = museumDetails[museumId];
+            if (!museum || !museum.fees) return 0;
+            
+            const fees = nationality === 'indian' ? museum.fees.indian : museum.fees.foreign;
+            return parseInt(fees.adult[currentLanguage].replace('₹', '')) * window.ticketQuantity;
+        }
+
+        function scrollToBottom() {
+            const chatBox = document.getElementById("chat-box");
+            setTimeout(() => {
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }, 100);
+        }
+
+        // Add this in your script section
+        function sendMessage() {
+            const userInput = document.getElementById('user-input');
+            const chatBox = document.getElementById('chat-box');
+            const message = userInput.value.trim();
+
+            if (message) {
+                // Add user message to chat
+                chatBox.innerHTML += `<div class="message user">${message}</div>`;
+                
+                // Clear input
+                userInput.value = '';
+
+                // Send to backend and get response
+                fetch('/get_response', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: message })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Add bot response to chat
+                    chatBox.innerHTML += `<div class="message bot">${data.response}</div>`;
+                    scrollToBottom();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    chatBox.innerHTML += `<div class="message bot">Sorry, I'm having trouble responding right now.</div>`;
+                    scrollToBottom();
+                });
+
+                scrollToBottom();
+            }
+        }
+
+        // Add event listener for Enter key
+        document.getElementById('user-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>

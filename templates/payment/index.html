@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment - MuseoBot</title>
+    <style>
+        /* ... keep your existing styles ... */
+    </style>
+</head>
+<body>
+    <div class="payment-wrapper">
+        <div class="payment-options">
+            <div class="payment-header">
+                <img src="{{ url_for('static', filename='images/new.png') }}" alt="MuseoBot Logo" class="logo">
+                Payment Options
+            </div>
+            <div class="payment-method" data-method="card">Credit/Debit Card</div>
+            <div class="payment-method" data-method="banking">Net Banking</div>
+            <div class="payment-method" data-method="upi">UPI</div>
+            <div class="payment-method" data-method="googlepay">Google Pay</div>
+        </div>
+
+        <div class="payment-form">
+            <div class="payment-form-content">
+                <div id="card-section" class="payment-section">
+                    <h3>Card Payment</h3>
+                    <input type="text" placeholder="Card Number">
+                    <div class="form-row">
+                        <input type="text" placeholder="MM/YY">
+                        <input type="text" placeholder="CVV">
+                    </div>
+                    <input type="text" placeholder="Card Holder Name">
+                    <button onclick="verifyPayment('card')">Pay Now</button>
+                </div>
+
+                <div id="upi-section" class="payment-section" style="display: none;">
+                    <h3>UPI Payment</h3>
+                    <div class="upi-qr" style="text-align: center; margin: 20px 0;">
+                        <img src="{{ url_for('static', filename='images/qr-code.png') }}" alt="UPI QR Code" style="max-width: 200px;">
+                    </div>
+                    <p style="text-align: center; margin-bottom: 20px;">Or pay using UPI ID</p>
+                    <input type="text" placeholder="Enter UPI ID (e.g., name@upi)">
+                    <button onclick="verifyUPI()">Verify & Pay</button>
+                </div>
+                
+                <div id="payment-success" style="display: none; text-align: center; color: #4CAF50;">
+                    <h3>Payment Successful!</h3>
+                    <p>Your ticket has been booked.</p>
+                    <button onclick="window.location.href='/'">Return to Home</button>
+                </div>
+
+                <form id="payment-form" style="display: none;">
+                    <input type="hidden" name="museum" id="museum">
+                    <input type="hidden" name="tickets" id="tickets">
+                    <input type="hidden" name="date" id="date">
+                    <input type="hidden" name="time" id="time">
+                    <input type="hidden" name="price" id="price">
+                    <input type="hidden" name="nationality" id="nationality">
+                    <input type="hidden" name="payment_method" id="payment_method">
+                </form>
+            </div>
+        </div>
+
+        <div class="payment-summary">
+            <h3>Order Summary</h3>
+            <p>Number of Tickets: {{ number_of_people }}</p>
+            <p>Nationality: {{ nationality }}</p>
+            <hr>
+            <h3>Total Amount: ₹{{ total_price }}</h3>
+        </div>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.payment-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            // Show selected section
+            document.getElementById(sectionId + '-section').style.display = 'block';
+        }
+
+        function verifyUPI() {
+            const upiId = document.querySelector('#upi-section input').value;
+            if (upiId.includes('@')) {
+                showProcessing();
+                // Simulate payment success after 2 seconds
+                setTimeout(() => {
+                    window.location.href = '/success';
+                }, 2000);
+            } else {
+                alert('Please enter a valid UPI ID');
+            }
+        }
+
+        function verifyPayment(method) {
+            showProcessing();
+            // Simulate payment success after 2 seconds
+            setTimeout(() => {
+                window.location.href = '/success';
+            }, 2000);
+        }
+
+        function showProcessing() {
+            const paymentForm = document.querySelector('.payment-form-content');
+            paymentForm.innerHTML = `
+                <div style="text-align: center;">
+                    <div class="loading" style="margin: 20px auto;">Processing Payment...</div>
+                </div>
+            `;
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show card section by default
+            showSection('card');
+            
+            // Add click handlers to payment methods
+            document.querySelectorAll('.payment-method').forEach(method => {
+                method.addEventListener('click', () => {
+                    showSection(method.dataset.method);
+                });
+            });
+
+            // Get URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            // Update hidden form fields
+            document.getElementById('museum').value = urlParams.get('museum_name') || '';
+            document.getElementById('tickets').value = urlParams.get('number_of_people') || '';
+            document.getElementById('date').value = urlParams.get('date') || '';
+            document.getElementById('time').value = urlParams.get('time') || '';
+            document.getElementById('price').value = urlParams.get('price') || '';
+            document.getElementById('nationality').value = urlParams.get('nationality') || '';
+        });
+    </script>
+</body>
+</html> 
